@@ -117,7 +117,12 @@ public class DockerAttributes {
     public static final AttributeSensorAndConfigKey<Entity, Entity> DOCKER_INFRASTRUCTURE = ConfigKeys.newSensorAndConfigKey(Entity.class,
             "docker.infrastructure", "The Docker infrastructure");
 
-    // Thes configurations must be set on the specific entity and will not be inherited
+    @SetFromFlag("links")
+    public static final ConfigKey<List<Entity>> DOCKER_LINKS = ConfigKeys.newConfigKey(
+            new TypeToken<List<Entity>>() { },
+            "docker.container.links", "List of linked entities for a container");
+
+    // These configurations must be set on the specific entity and will not be inherited
 
     public static final ConfigKey<List<PortAttributeSensorAndConfigKey>> DOCKER_DIRECT_PORT_CONFIG = ConfigKeys.builder(new TypeToken<List<PortAttributeSensorAndConfigKey>>() { })
             .name("docker.container.directPorts.configKeys")

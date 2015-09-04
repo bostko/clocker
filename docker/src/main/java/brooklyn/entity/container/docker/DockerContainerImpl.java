@@ -61,7 +61,6 @@ import org.apache.brooklyn.core.config.ConfigKeys;
 import org.apache.brooklyn.core.config.render.RendererHints;
 import org.apache.brooklyn.core.entity.Attributes;
 import org.apache.brooklyn.core.entity.Entities;
-import org.apache.brooklyn.core.entity.EntityInternal;
 import org.apache.brooklyn.core.entity.lifecycle.Lifecycle;
 import org.apache.brooklyn.core.entity.lifecycle.ServiceStateLogic;
 import org.apache.brooklyn.core.feed.ConfigToAttributes;
@@ -364,6 +363,14 @@ public class DockerContainerImpl extends BasicStartableImpl implements DockerCon
         if (entityEnvironment != null) {
             environment.add(Joiner.on(":").withKeyValueSeparator("=").join(entityEnvironment));
         }
+        // TODO generate environment variables from docker.container.links
+        List<Entity> links = entity.config().get(DockerAttributes.DOCKER_LINKS);
+        Map<String, Object> linkEnvironment = MutableMap.of();
+        if (links != null && links.size() > 0) {
+            for (Entity linked : links) {
+                linkEnvironment.putAll(generateLinks(linked));
+            }
+        }
         Map<String, Object> containerEnvironment = MutableMap.of();
         for (String entry : environment) {
             List<String> split = Splitter.on('=').trimResults().splitToList(entry);
@@ -415,6 +422,15 @@ public class DockerContainerImpl extends BasicStartableImpl implements DockerCon
         options.overrideLoginPassword(getDockerHost().getPassword());
 
         return options;
+    }
+
+    // TODO generate the list of link environment variables
+    private Map<String, Object> generateLinks(Entity target) {
+        // XXX variables required per entity
+        // REDIS_PORT = "tcp://%s:%d"
+        // REDIS_6379_PORT_TCP_ADDR = "%s"
+        // REDIS_6379_PORT_TCP_PORT = "%d"
+        return ImmutableMap.<String, Object>of();
     }
 
     @Nullable
